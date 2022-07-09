@@ -1,6 +1,7 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
-import {Notify} from 'notiflix';
+import { Notify } from 'notiflix';
+import { fetchCountries } from "./fetchCountries";
 
 const DEBOUNCE_DELAY = 300;
 const countryListEL = document.querySelector('.country-list')
@@ -14,14 +15,18 @@ const inputValue = evt => {
         countryListEL.innerHTML = '';
         divEl.innerHTML = '';
 
-        fetchCountries(value).then(qwe).catch((error) => {
+        fetchCountries(value).then(quantityСheck).catch((error) => {
             console.log('error', error) 
             Notify.failure('Oops, there is no country with that name');
         });
     }
+     if (value === '') {
+        divEl.innerHTML = '';
+        countryListEL.innerHTML = '';
+    }
 }
 
-function qwe(data) {
+function quantityСheck(data) {
     if (data.length > 10) {
         Notify.info('Too many matches found. Please enter a more specific name.');
         return
@@ -31,23 +36,13 @@ function qwe(data) {
     } else {
         renderContryInfo(data)
     }
+   
 }
 
 
 const debounceInput = debounce(inputValue, DEBOUNCE_DELAY)
 inputEl.addEventListener('input', debounceInput);
 
-
-function fetchCountries(name) {
-    return fetch(`https://restcountries.com/v3.1/name/${name}?name.official&capital&population&flags.svg&languages`).then(
-        (response) => {
-            if (!response.ok) {
-                throw new Error(response.status);
-            }
-            return response.json();
-        }
-    );
-}
 
 function renderContryInfo(countries) {
     const langs = Object.values(countries[0].languages) 
